@@ -6,6 +6,7 @@ export default function TestJWT() {
     // Declare state variables at the top of your component
     const [accessToken, setAccessToken] = useState("");
     const [user, setUser] = useState(null);
+    const [unauthorized, setUnauthorized] = useState(false);
 
     // Handle Login
     const handleLogin = async () => {
@@ -39,7 +40,7 @@ export default function TestJWT() {
         const body = {
             name: "casual wardrobe update1",
         };
-        fetch(`${process.env.NEXT_PUBLIC_DJANGO_API_URL}/api/products/${499}`, {
+        const res = await  fetch(`${process.env.NEXT_PUBLIC_DJANGO_API_URL}/api/products/${499}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -47,27 +48,51 @@ export default function TestJWT() {
             },
             body: JSON.stringify(body),
         })
-            .then((res) => res.json())
-            .then((data) => console.log("Data from partial ",data))
-            .then((response) => {
-                console.log("Response from partial update: ", response);
-            })
-            .then((data) => {
-                console.log("Data in jwt test: ", data);
-            })
-            .catch((error) => {
-                console.error("Failed to update product:", error);
-            });
+       if (res.status === 401) {
+           setUnauthorized(true);
+       }
+       const data = await res.json();
+        console.log("Data from partial update: ", data)
     };
+
+    // handle refresh token
+    const handleRefreshToken = async () => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/refresh`, {
+            method: "POST",
+            credentials: "include",
+            body: JSON.stringify({}),
+        }).then((res) => res.json())
+            .then((data) => {
+                setAccessToken(data.accessToken);
+            console.log("Data from refresh token: ", data);
+        }).catch((error) => {
+            console.log("Failed to refresh token:", error);
+        }
+        );
+    };
+
 
     return (
         <main className={"h-screen grid place-content-center"}>
-            <h1 className={"text-5xl p-4"}>Test Handle Login</h1>
+            <h1 className={"text-5xl p-4 mb-4"}>Test Handle Login</h1>
 
             {/* Login Button */}
-            <button className={"p-4 bg-blue-600 rounded-3xl text-3xl text-gray-100"} onClick={handleLogin}>Login</button>
+            <button className={"my-4 p-4 bg-blue-600 rounded-3xl text-3xl text-gray-100 mt-4"}
+                    onClick={handleLogin}>Login
+            </button>
             {/* Partial Update Button */}
-            <button className={"p-4 bg-blue-600 rounded-3xl text-3xl text-gray-100"} onClick={handlePartialUpdate}>Update Product</button>
+            <button className={"my-4 p-4 bg-blue-600 rounded-3xl text-3xl text-gray-100"}
+                    onClick={handlePartialUpdate}>
+                Update Product</button>
+
+            {unauthorized && (
+                <button className={"my-4 p-4 bg-blue-600 rounded-3xl text-3xl text-gray-100"}
+                                      onClick={handleRefreshToken}>Refresh Token
+            </button>
+            )}
+
+
         </main>
     );
+
 }
