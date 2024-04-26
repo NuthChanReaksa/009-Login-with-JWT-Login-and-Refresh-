@@ -14,7 +14,7 @@ export default function TestJWT() {
         const password = "admin@1234";
 
         try {
-            const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/login', {
+            const response = await fetch(process.env.NEXT_PUBLIC_DJANGO_API_URL + '/api/user/login/', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -28,7 +28,8 @@ export default function TestJWT() {
 
             const data = await response.json();
             // Assuming the response contains an access token and user information
-            setAccessToken(data.accessToken);
+            setAccessToken(data.access_token);
+            console.log(data)
             setUser(data.user);
         } catch (error) {
             console.error("Failed to login:", error);
@@ -37,10 +38,11 @@ export default function TestJWT() {
 
     // Handle Partial Update
     const handlePartialUpdate = async () => {
+        console.log(accessToken)
         const body = {
-            name: "casual wardrobe update1",
+            name: "casual wardrobe update45",
         };
-        const res = await  fetch(`${process.env.NEXT_PUBLIC_DJANGO_API_URL}/api/products/${499}`, {
+        const res = await  fetch(`${process.env.NEXT_PUBLIC_DJANGO_API_URL}/api/products/${594}`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
@@ -48,12 +50,12 @@ export default function TestJWT() {
             },
             body: JSON.stringify(body),
         })
-       if (res.status === 401) {
-           setUnauthorized(true);
-       }
-       const data = await res.json();
-        console.log("Data from partial update: ", data)
+        const data = await res.json();
+        console.log(data);
+
     };
+
+
 
     // handle refresh token
     const handleRefreshToken = async () => {
@@ -71,6 +73,26 @@ export default function TestJWT() {
         );
     };
 
+    // handle logout
+    const handleLogout = async () => {
+        const url = process.env.NEXT_PUBLIC_API_URL + "/logout";
+        console.log(url);
+        fetch(process.env.NEXT_PUBLIC_API_URL + "/logout" , {
+
+            method: "POST",
+            credentials: "include",
+            body: JSON.stringify({}),
+        }).then((res) => res.json())
+            .then((data) => {
+                setAccessToken(data.accessToken);
+                setUser(null);
+            console.log("Data from logout: ", data);
+        }).catch((error) => {
+            console.log("Failed to logout:", error);
+        }
+        );
+    }
+
 
     return (
         <main className={"h-screen grid place-content-center"}>
@@ -83,14 +105,19 @@ export default function TestJWT() {
             {/* Partial Update Button */}
             <button className={"my-4 p-4 bg-blue-600 rounded-3xl text-3xl text-gray-100"}
                     onClick={handlePartialUpdate}>
-                Update Product</button>
-
+                Update Product
+            </button>
+            {/*Refresh token Button*/}
             {unauthorized && (
                 <button className={"my-4 p-4 bg-blue-600 rounded-3xl text-3xl text-gray-100"}
-                                      onClick={handleRefreshToken}>Refresh Token
-            </button>
+                        onClick={handleRefreshToken}>Refresh Token
+                </button>
             )}
-
+            {/*Logout Button*/}
+            <button className={"my-4 p-4 bg-blue-600 rounded-3xl text-3xl text-gray-100"}
+                    onClick={handleLogout}>
+                Logout
+            </button>
 
         </main>
     );

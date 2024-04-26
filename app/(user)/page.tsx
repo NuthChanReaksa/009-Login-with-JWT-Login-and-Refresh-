@@ -5,10 +5,25 @@ import { useEffect } from "react";
 import { fetchUserProfile } from "@/redux/features/userProfile/userProfileSlice";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
+import { useGetProductsQuery } from "@/redux/service/ecommerce";
+import {useSelector} from "react-redux";
 
 export default function Home() {
+	// Get products with generated hook
+	const { data, error, isLoading, isFetching } = useGetProductsQuery({
+		page: 1,
+		pageSize: 10,
+	});
+	const state = useSelector((state) => state);
+	console.log("State : ", state);
+
+	console.log("Data : ", data);
+	console.log("Error : ", error);
+	console.log("Is Loading : ", isLoading);
+
+
 	const { data: session } = useSession();
-	console.log(session);
+	// console.log(session);
 	const router = useRouter();
 	const dispatch = useAppDispatch();
 

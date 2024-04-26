@@ -26,6 +26,8 @@ const initialState: initialStateType = {
 };
 
 // create asyn thunk
+
+// Handle Fetch User Profile
 export const fetchUserProfile = createAsyncThunk("userProfile/fetchUserProfile", async () => {
     const response = await fetch(`${BASE_URL}/api/user/profile/`,{
         headers: {
@@ -35,6 +37,17 @@ export const fetchUserProfile = createAsyncThunk("userProfile/fetchUserProfile",
     const data = await response.json();
     return data;
 })
+
+// Handle Fetch User address
+/*export const fetchUserAddress = createAsyncThunk("userAddress/fetchUserAddress", async () => {
+    const response = await fetch(`${BASE_URL}/api/user/address/`,{
+        headers: {
+            Authorization: `Bearer ${ACCESS_TOKEN}`
+        }
+    });
+    const data = await response.json();
+    return data;
+})*/
 
  const userProfileSlice = createSlice({
     name: "userProfile",

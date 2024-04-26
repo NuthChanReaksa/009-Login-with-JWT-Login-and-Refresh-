@@ -2,14 +2,20 @@ import { configureStore } from '@reduxjs/toolkit'
 import counterSlice from './features/counter/counterSlice'
 import cartSlice from './features/cart/cartSlice'
 import  userProfileSlice  from './features/userProfile/userProfileSlice'
+import {ecommerceApi} from "@/redux/service/ecommerce";
 // create store
 export const makeStore = () => {
   return configureStore({
     reducer: {
+        [ecommerceApi.reducerPath]: ecommerceApi.reducer,
         counter: counterSlice,
         cart: cartSlice,
         userProfile: userProfileSlice
-    }
+    },
+      // Adding the api middleware enables caching, invalidation, polling,
+      // and other useful features of `rtk-query`.
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware().concat(ecommerceApi.middleware),
   })
 }
 

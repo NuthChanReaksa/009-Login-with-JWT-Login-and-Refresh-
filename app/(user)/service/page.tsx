@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import {useGetProductsQuery} from "@/redux/service/ecommerce";
 
 const ENDPOINT = "https://fakestoreapi.com/products/";
 
@@ -11,7 +12,17 @@ export default function Service() {
 	const { data: session } = useSession();
 	const [products, setProducts] = useState([]);
 	const router = useRouter();
-	
+
+	// Get products with generated hook
+	const { data, error, isLoading, isFetching } = useGetProductsQuery({
+		page: 1,
+		pageSize: 10,
+	});
+	console.log("Data : ", data);
+	console.log("Error : ", error);
+	console.log("Is Loading : ", isLoading);
+
+
 
 	useEffect(() => {
 		fetch(ENDPOINT)
